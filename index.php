@@ -178,12 +178,15 @@
             $searchTerm = $_POST["search"];
             $searchField = $_POST["searchField"];
 
-            if ($searchField == "*") {
+            if ($searchTerm == "") {
+                // Zeige alle Einträge an, wenn das Suchfeld leer ist
+                $ldapFilter = "(&(objectClass=person)(objectCategory=person)(|(company=example)(company=example2)))";
+            } elseif ($searchField == "*") {
                 // Suche in allen Feldern
-                $ldapFilter = "(&(objectClass=person)(objectCategory=person)(company=example)(|(cn=*{$searchTerm}*)(physicaldeliveryofficename=*{$searchTerm}*)(telephonenumber=*{$searchTerm}*)(mobile=*{$searchTerm}*)(mail=*{$searchTerm}*)(department=*{$searchTerm}*)(title=*{$searchTerm}*)))";
+                $ldapFilter = "(&(objectClass=person)(objectCategory=person)(|(company=example)(company=example2))(|(cn=*{$searchTerm}*)(physicaldeliveryofficename=*{$searchTerm}*)(telephonenumber=*{$searchTerm}*)(mobile=*{$searchTerm}*)(mail=*{$searchTerm}*)(department=*{$searchTerm}*)(title=*>
             } else {
                 // Suche in einem bestimmten Feld
-                $ldapFilter = "(&(objectClass=person)(objectCategory=person)({$searchField}=*{$searchTerm}*))";
+                $ldapFilter = "(&(objectClass=person)(objectCategory=person)(|(company=example)(company=example2))(|({$searchField}=*{$searchTerm}*)))";
             }
 
             $ldapFields = array("sn", "givenname", "physicaldeliveryofficename", "telephonenumber", "mobile", "mail", "department", "title");
@@ -200,6 +203,12 @@
                 for ($i = 0; $i < $ldapEntries["count"]; $i++) {
                     $name = isset($ldapEntries[$i]["sn"][0]) ? $ldapEntries[$i]["sn"][0] : "-";
                     $givenname = isset($ldapEntries[$i]["givenname"][0]) ? $ldapEntries[$i]["givenname"][0] : "-";
+
+                    // Überspringe Einträge ohne Vorname und Nachname
+                    if ($name === "-" && $givenname === "-") {
+                       continue;
+                    }
+
                     $roomNumber = isset($ldapEntries[$i]["physicaldeliveryofficename"][0]) ? $ldapEntries[$i]["physicaldeliveryofficename"][0] : "-";
                     $phoneNumber = isset($ldapEntries[$i]["telephonenumber"][0]) ? $ldapEntries[$i]["telephonenumber"][0] : "-";
                     $mobileNumber = isset($ldapEntries[$i]["mobile"][0]) ? $ldapEntries[$i]["mobile"][0] : "-";
