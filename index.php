@@ -286,9 +286,9 @@
                 const valueB = b.cells[columnIndex].textContent.toLowerCase();
 
                 if (valueA < valueB) {
-                    return isAscending ? -1 : 1;
-                } else if (valueA > valueB) {
                     return isAscending ? 1 : -1;
+                } else if (valueA > valueB) {
+                    return isAscending ? -1 : 1;
                 } else {
                     return 0;
                 }
